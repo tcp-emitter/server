@@ -1,0 +1,39 @@
+{
+  "name": "tcp-emitter",
+  "version": "1.0.0",
+  "description": "Event Emitter for TCP connected apps",
+  "main": "index.js",
+  "scripts": {
+    "docs": "jsdoc -r -c conf.json && hs -c0 ./out",
+    "test": "standard && nyc --reporter=html mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tcp-emitter/server.git"
+  },
+  "keywords": [
+    "event",
+    "emitter",
+    "tcp",
+    "router",
+    "server"
+  ],
+  "author": "Luca Tabone <taboneluca3@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tcp-emitter/server/issues"
+  },
+  "homepage": "https://github.com/tcp-emitter/server#readme",
+  "standard": {
+    "env": {
+      "mocha": true
+    }
+  },
+  "devDependencies": {
+    "http-server": "^0.10.0",
+    "jsdoc": "^3.5.3",
+    "mocha": "^3.5.0",
+    "nyc": "^11.1.0",
+    "standard": "^10.0.3"
+  }
+}

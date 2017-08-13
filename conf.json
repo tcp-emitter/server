@@ -1,0 +1,20 @@
+{
+  "sourceType": "module",
+  "opts": {
+    "recursive": true
+  },
+  "plugins": [
+    "plugins/markdown"
+  ],
+  "source": {
+    "include": [ "./docs.js", "src/", "index.js" ]
+  },
+  "tags": {
+    "allowUnknownTags": false,
+    "dictionaries": [ "jsdoc" ]
+  },
+  "templates": {
+    "cleverLinks": true,
+    "monospaceLinks": true
+  }
+}
