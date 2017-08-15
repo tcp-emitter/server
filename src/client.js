@@ -1,6 +1,7 @@
 'use strict'
 
 const utils = require('./utils')
+const eventList = require('./event-list')
 
 /**
  * @module tcp-emitter-client
@@ -12,13 +13,6 @@ module.exports = {
    * @type {module:tcp-emitter.delimiter}
    */
   delimiter: null,
-
-  /**
-   * Name of the event emitted by TCP Emitter clients upon the receival of a
-   * valid payload.
-   * @type {string}
-   */
-  tcpEmitterPayloadEvent: null,
 
   /**
    * Stores the name of the events which the TCP Emitter client is subscribed
@@ -35,20 +29,13 @@ module.exports = {
    * @param  {string} opts.delimiter              Delimiter used to seperate
    *                                              payloads in a single TCP
    *                                              request
-   * @param  {string} opts.tcpEmitterPayloadEvent Name of the event emitted
-   *                                              by TCP Emitter clients upon
-   *                                              the receival of a valid
-   *                                              payload.
    */
-  init ({ delimiter, tcpEmitterPayloadEvent }) {
+  init ({ delimiter }) {
     // Setup subscriptions list.
     this.subscriptions = []
 
     // Setup delimiter.
     this.delimiter = delimiter
-
-    // Setup event name used to emit valid TCP Emitter payloads.
-    this.tcpEmitterPayloadEvent = tcpEmitterPayloadEvent
 
     // Setup default encoding.
     this.setEncoding('utf-8')
@@ -91,7 +78,7 @@ module.exports = {
       if (isTypeValid !== false || isEventValid !== false) return
 
       // Emit payload to TCP Emitter Payload event if found valid.
-      this.emit(this.tcpEmitterPayloadEvent, payload)
+      this.emit(eventList.payload, payload)
     })
   }
 }

@@ -1,13 +1,7 @@
 'use strict'
 
+const eventList = require('./event-list')
 const tcpEmitterClient = require('./client')
-
-/**
- * Name of the event emitted by TCP Emitter clients upon the receival of a valid
- * payload.
- * @type {string}
- */
-const TCP_EMITTER_PAYLOAD_EVENT = 'tcp-emitter-payload'
 
 /**
  * @module tcp-emitter
@@ -88,13 +82,12 @@ module.exports = {
 
     // Initialize the newly created TCP Emitter client.
     tcpEmitterClientInst.init({
-      delimiter: this.delimiter,
-      tcpEmitterPayloadEvent: TCP_EMITTER_PAYLOAD_EVENT
+      delimiter: this.delimiter
     })
 
     // Listen for & parse new TCP Emitter payloads sent by the TCP Emitter
     // client.
-    tcpEmitterClientInst.on(TCP_EMITTER_PAYLOAD_EVENT, payload => {
+    tcpEmitterClientInst.on(eventList.payload, payload => {
       this.parsePayload({ payload, socket: tcpEmitterClientInst })
     })
 
