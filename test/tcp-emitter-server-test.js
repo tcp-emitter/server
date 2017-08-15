@@ -2,6 +2,7 @@
 
 const net = require('net')
 const assert = require('assert')
+const eventList = require('../src/event-list')
 const tcpEmitterServer = require('../src/index')
 const { net: netUtils, payload: payloadUtils } = require('./utils')
 
@@ -24,6 +25,77 @@ describe('TCP Emitter Server Tests:', function () {
 
       it('should return new instance of `net.Server`', function () {
         assert.ok(serverInst instanceof net.Server)
+      })
+    })
+  })
+
+  describe('Scenario: Subscribing to an event:', function () {
+    describe('Given a TCP Emitter server,', function () {
+      /**
+       * TCP Emitter server.
+       * @type {Object}
+       */
+      let serverInst = null
+
+      beforeEach(function () {
+        // Create the TCP Emitter Server which the TCP Emitter client will be
+        // connecting to.
+        return netUtils.createTCPEmitterServer().then(server => {
+          serverInst = server
+        })
+      })
+
+      afterEach(function () {
+        return netUtils.closeTCPEmitterServer(serverInst)
+      })
+
+      describe('with a connected TCP Emitter client,', function () {
+        /**
+         * TCP Emitter client that will be subscribing to an event.
+         * @type {net.Socket}
+         */
+        let clientInst = null
+
+        beforeEach(function () {
+          // Create the TCP Emitter client and connect it with the TCP Emitter
+          // server for this test.
+          return netUtils.createTCPEmitterClient(serverInst.address())
+            .then(client => {
+              clientInst = client
+            })
+        })
+
+        afterEach(function () {
+          return netUtils.closeTCPEmitterClient(clientInst)
+        })
+
+        describe('when the TCP Emitter client subscribes to an event:', function () {
+          /**
+           * Event which the TCP Emitter client will be subscribing to.
+           * @type {string}
+           */
+          let event = null
+
+          beforeEach(function () {
+            event = 'event-name'
+          })
+
+          it('should emit TCP Emitter Subscription Event with the TCP Emitter client & Event name', function (done) {
+            serverInst.on(eventList.subscribe, (socket, eventName) => {
+              // Assert that the emitted event name is the same as the event
+              // name which the TCP Emitter client subscribed to.
+              assert.strictEqual(event, eventName)
+
+              // Assert that socket is of type 'net.Socket'.
+              assert.ok(socket instanceof net.Socket)
+
+              done()
+            })
+
+            // Subscribe to an event.
+            clientInst.write(payloadUtils.createSubscribe({ event }))
+          })
+        })
       })
     })
   })

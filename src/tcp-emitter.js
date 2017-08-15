@@ -163,6 +163,10 @@ module.exports = {
 
     // Finally include the TCP Emitter client in the event's list of listeners.
     listeners.push(socket)
+
+    // Emit TCP Emitter Subscribe Event with the TCP Emitter client & name of
+    // the event.
+    this.emit(eventList.subscribe, socket, event)
   },
 
   /**
