@@ -2,6 +2,7 @@
 
 const net = require('net')
 const assert = require('assert')
+const EventEmitter = require('events')
 const { payload: payloadUtils } = require('./utils')
 const tcpEmitter = require('../src/tcp-emitter')
 
@@ -17,7 +18,8 @@ describe('TCP Emitter Tests:', function () {
       beforeEach(function () {
         // Create and initialize the TCP Emitter instance which the TCP Emitter
         // clients will be connecting to.
-        tcpEmitterInst = Object.create(tcpEmitter)
+        tcpEmitterInst = Object.assign(Object.create(new EventEmitter()),
+          tcpEmitter)
         tcpEmitterInst.init()
       })
 
@@ -114,7 +116,8 @@ describe('TCP Emitter Tests:', function () {
       beforeEach(function () {
         // Create and initialize the TCP Emitter instance which the TCP Emitter
         // clients will be connecting to.
-        tcpEmitterInst = Object.create(tcpEmitter)
+        tcpEmitterInst = Object.assign(Object.create(new EventEmitter()),
+          tcpEmitter)
         tcpEmitterInst.init()
       })
 
