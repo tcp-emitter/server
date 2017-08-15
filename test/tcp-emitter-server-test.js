@@ -354,7 +354,7 @@ describe('TCP Emitter Server Tests:', function () {
        * TCP Emitter server.
        * @type {Object}
        */
-      var serverInst = null
+      let serverInst = null
 
       beforeEach(function () {
         // Create the TCP Emitter Server which the TCP Emitter clients will be
