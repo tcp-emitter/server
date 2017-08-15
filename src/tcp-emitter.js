@@ -146,7 +146,7 @@ module.exports = {
    * Function used to subscribe a TCP Emitter client to an event.
    * @see {@link https://nodejs.org/api/net.html#net_class_net_socket|
    *      net.Socket}
-   * @param  {net.Socket} opts        Options for subscribe function.
+   * @param  {Object} opts            Options for subscribe function.
    * @param  {net.Socket} opts.socket TCP Emitter client to be subscribed.
    * @param  {stirng}     opts.event  Event name which the TCP Emitter client
    *                                  will be subscribing to.
@@ -176,7 +176,7 @@ module.exports = {
    * Function used to unsubscribe a TCP Emitter client from an event.
    * @see {@link https://nodejs.org/api/net.html#net_class_net_socket|
    *      net.Socket}
-   * @param  {net.Socket} opts        Options for unsubscribe function.
+   * @param  {Object} opts            Options for unsubscribe function.
    * @param  {net.Socket} opts.socket TCP Emitter client to be unsubscribed.
    * @param  {string} opts.event      Event name which the TCP Emitter client
    *                                  will be unsubscribed from.
@@ -234,7 +234,7 @@ module.exports = {
    * which itself is subscribed to, it won't be notified.
    * @see {@link https://nodejs.org/api/net.html#net_class_net_socket|
    *      net.Socket}
-   * @param  {net.Socket} opts        Options for broadcast function.
+   * @param  {Object} opts            Options for broadcast function.
    * @param  {net.Socket} opts.socket TCP Emitter client broadcasting the
    *                                  payload.
    * @param  {string} opts.event      Event which the payload will be

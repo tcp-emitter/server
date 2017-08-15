@@ -31,7 +31,7 @@ module.exports = {
 
   /**
    * Function used to initialize a TCP Emitter client.
-   * @param  {string} opts                        Options for init function.
+   * @param  {Object} opts                        Options for init function.
    * @param  {string} opts.delimiter              Delimiter used to seperate
    *                                              payloads in a single TCP
    *                                              request

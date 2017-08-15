@@ -125,7 +125,7 @@ describe('TCP Emitter Server Tests:', function () {
           describe('when a TCP Emitter client broadcasts to an event:', function () {
             /**
              * Arguments that will be broadcasted.
-             * @type {Array.<any>}
+             * @type {Array.<*>}
              */
             let args = null
 
@@ -292,7 +292,7 @@ describe('TCP Emitter Server Tests:', function () {
             describe('when a TCP Emitter client broadcasts to an event:', function () {
               /**
                * Arguments that will be broadcasted.
-               * @type {Array.<any>}
+               * @type {Array.<*>}
                */
               let args = null
 
@@ -420,13 +420,13 @@ describe('TCP Emitter Server Tests:', function () {
           describe('when broadcasting multiple payloads with a single TCP request:', function () {
             /**
              * Arguments that will be broadcasted in the first payload.
-             * @type {Array.<any>}
+             * @type {Array.<*>}
              */
             let argsOne = null
 
             /**
              * Arguments that will be broadcasted in the second payload.
-             * @type {Array.<any>}
+             * @type {Array.<*>}
              */
             let argsTwo = null
 

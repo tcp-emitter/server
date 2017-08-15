@@ -35,7 +35,7 @@ module.exports = {
    * Function used to create the payload for broadcasting data to an event.
    * @param  {string} options.event      Event which the message will be
    *                                     broadcasted to.
-   * @param  {Array.<any>} options.args  Data to be broadcasted.
+   * @param  {Array.<*>} options.args  Data to be broadcasted.
    * @param  {string} options.delimiter  Delimiter used to seperate payloads in
    *                                     a single TCP request.
    * @return {string}                    Broadcasting payload of data to an
