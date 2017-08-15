@@ -44,6 +44,7 @@ module.exports = function createTCPEmitterServer (opts = {}) {
 
   // Expose events that can be used by the TCP Emitter server user.
   ;[
+    'error',
     eventList.subscribe,
     eventList.broadcast,
     eventList.unsubscribe
