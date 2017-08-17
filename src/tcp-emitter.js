@@ -1,5 +1,6 @@
 'use strict'
 
+const utils = require('./utils')
 const eventList = require('./event-list')
 const tcpEmitterClient = require('./client')
 
@@ -164,8 +165,9 @@ module.exports = {
     // Finally include the TCP Emitter client in the event's list of listeners.
     listeners.push(socket)
 
-    // Emit TCP Emitter Subscribe Event with the TCP Emitter client & name of
-    // the event.
+    // Emit TCP Emitter Subscribe Event with:
+    //   * the TCP Emitter client.
+    //   * name of the event.
     this.emit(eventList.subscribe, socket, event)
   },
 
@@ -245,15 +247,33 @@ module.exports = {
      */
     const listeners = this.subscriptions[event]
 
-    // Stop process if the specified event has no listeners.
-    if (listeners === undefined) return
+    // Stores the promises created upon the request to notify the listeners of
+    // the event, so that when they are all notified TCP Emitter can emit the
+    // TCP Emitter Broadcast Event.
+    const promises = []
 
-    // Broadcast the payload to all the listeners of the specified event
+    // Broadcast the payload to all the listeners of the specified event,
     // ignoring the TCP Emitter client which the payload originated from.
-    listeners.forEach(listener => {
-      if (listener === socket) return
-      listener.write(JSON.stringify({ event, args }) + this.delimiter)
-    })
+    if (listeners !== undefined) {
+      listeners.forEach(listener => {
+        // Ignore listener if it is the TCP Emitter client that did the
+        // broadcast.
+        if (listener === socket) return
+
+        // Notify listener (TCP Emitter client).
+        promises.push(utils.write(listener, JSON.stringify({ event, args }) +
+          this.delimiter))
+      })
+    }
+
+    // Once all the event listeners (TCP Emitter clients) have been notified,
+    // emit the TCP Emitter Broadcast Event with:
+    //   * the TCP Emitter client.
+    //   * name of the event.
+    //   * the broadcasted arguments.
+    return Promise.all(promises).then(() => {
+      this.emit(eventList.broadcast, socket, event, args)
+    }).catch(err => this.emit('error', err))
   },
 
   /**
