@@ -98,6 +98,77 @@ describe('TCP Emitter Server Tests:', function () {
     })
   })
 
+  describe('Scenario: Subscribing to an already subscribed event:', function () {
+    describe('Given a TCP Emitter server,', function () {
+      /**
+       * TCP Emitter server.
+       * @type {Object}
+       */
+      let serverInst = null
+
+      beforeEach(function () {
+        // Create the TCP Emitter server which the TCP Emitter client will be
+        // connecting to.
+        return netUtils.createTCPEmitterServer().then(server => {
+          serverInst = server
+        })
+      })
+
+      afterEach(function () {
+        return netUtils.closeTCPEmitterServer(serverInst)
+      })
+
+      describe('with a connected TCP Emitter client,', function () {
+        /**
+         * TCP Emitter client that will be subscribing to an event.
+         * @type {net.Socket}
+         */
+        let clientInst = null
+
+        beforeEach(function () {
+          // Create the TCP Emitter client and connect it with the TCP Emitter
+          // server for this test.
+          return netUtils.createTCPEmitterClient(serverInst.address())
+            .then(client => { clientInst = client })
+        })
+
+        afterEach(function () {
+          return netUtils.closeTCPEmitterClient(clientInst)
+        })
+
+        describe('that is subscribed to an event,', function () {
+          /**
+           * Event which the TCP Emitter client will be subscribing to.
+           * @type {string}
+           */
+          let event = null
+
+          beforeEach(function () {
+            event = 'event-name'
+            return clientInst.write(payloadUtils.createSubscribe({ event }))
+          })
+
+          describe('when re-subscribing to the same event:', function () {
+            it('should not emit TCP Emitter Subscribe Event', function (done) {
+              global.setTimeout(done, 500)
+
+              serverInst.on(eventList.subscribe, data => {
+                assert.fail('TCP Emitter server should not emit TCP Emitter ' +
+                  'Subscribe Event if the TCP Emitter client requests to ' +
+                  'subscribe to an event that it is already subscribed to')
+                done()
+              })
+
+              // Subscribe to an event which the TCP Emitter client is already
+              // subscribed to.
+              clientInst.write(payloadUtils.createSubscribe({ event }))
+            })
+          })
+        })
+      })
+    })
+  })
+
   describe('Scenario: Broadcasting to an event:', function () {
     describe('Given a TCP Emitter server,', function () {
       /**
