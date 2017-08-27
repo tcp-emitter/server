@@ -105,6 +105,64 @@ describe('TCP Emitter Tests:', function () {
     })
   })
 
+  describe('Scenario: Subscribing multiple times to same event:', function () {
+    describe('Given a TCP Emitter instance,', function () {
+      /**
+       * TCP Emitter instance.
+       * @type {Object}
+       */
+      let tcpEmitterInst = null
+
+      beforeEach(function () {
+        // Create and initialize the TCP Emitter instance which the TCP Emitter
+        // clients will be connecting to.
+        tcpEmitterInst = Object.create(tcpEmitter)
+        tcpEmitterInst.init()
+      })
+
+      describe('with a connected TCP Emitter client,', function () {
+        /**
+         * TCP Emitter client.
+         * @type {net.Socket}
+         */
+        let clientInst = null
+
+        beforeEach(function () {
+          // Create and setup the TCP Emitter client to work with TCP Emitter
+          // server.
+          clientInst = new net.Socket()
+          tcpEmitterInst.handleSocket({})(clientInst)
+        })
+
+        describe('that is subscribed to an event,', function () {
+          /**
+           * Event which the TCP Emitter cliens will be listening to.
+           * @type {string}
+           */
+          let event = null
+
+          beforeEach(function () {
+            event = 'event-name'
+
+            // Subscribe the TCP Emitter client to the events.
+            clientInst.emit('data', payloadUtils.createSubscribe({ event }))
+          })
+
+          describe('when trying to re-subscribe to the same event', function () {
+            beforeEach(function () {
+              clientInst.emit('data', payloadUtils.createSubscribe({ event }))
+            })
+
+            it('should ignore the subscription', function () {
+              // Assert that there is only one subscription.
+              assert.strictEqual(tcpEmitterInst.subscriptions[event].length, 1)
+            })
+          })
+        })
+      })
+    })
+  })
+
   describe('Scenario: Removing the last listener for an event:', function () {
     describe('Given a TCP Emitter instance,', function () {
       /**

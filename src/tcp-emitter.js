@@ -162,6 +162,10 @@ module.exports = {
       ? this.subscriptions[event]
       : this.subscriptions[event] = []
 
+    // Ignore subscription if TCP Emitter client is already subscribed to the
+    // event.
+    if (listeners.indexOf(socket) !== -1) return
+
     // Finally include the TCP Emitter client in the event's list of listeners.
     listeners.push(socket)
 
