@@ -169,6 +169,146 @@ describe('TCP Emitter Server Tests:', function () {
     })
   })
 
+  describe('Scenario: Unsubscribing from an event:', function () {
+    describe('Given a TCP Emitter server,', function () {
+      /**
+       * TCP Emitter server.
+       * @type {Object}
+       */
+      let serverInst = null
+
+      beforeEach(function () {
+        // Create the TCP Emitter server which the TCP Emitter client will be
+        // connecting to.
+        return netUtils.createTCPEmitterServer().then(server => {
+          serverInst = server
+        })
+      })
+
+      afterEach(function () {
+        return netUtils.closeTCPEmitterServer(serverInst)
+      })
+
+      describe('with a connected TCP Emitter client,', function () {
+        /**
+         * TCP Emitter client that will be unsubscribing from an event.
+         * @type {net.Socket}
+         */
+        let clientInst = null
+
+        beforeEach(function () {
+          // Create the TCP Emitter client and connect it with the TCP Emitter
+          // server for this test.
+          return netUtils.createTCPEmitterClient(serverInst.address())
+            .then(client => { clientInst = client })
+        })
+
+        afterEach(function () {
+          return netUtils.closeTCPEmitterClient(clientInst)
+        })
+
+        describe('that is subscribed to an event,', function () {
+          /**
+           * Event which the TCP Emitter client will be unsubscribing from.
+           * @type {string}
+           */
+          let event = null
+
+          beforeEach(function () {
+            event = 'event-name'
+            return clientInst.write(payloadUtils.createSubscribe({ event }))
+          })
+
+          describe('when the TCP Emitter client unsubscribes from an event:', function () {
+            it('should emit TCP Emitter Unsubscribe Event with the TCP Emitter client & Event name', function (done) {
+              serverInst.on(eventList.unsubscribe, (socket, eventName) => {
+                // Assert that the emitted event name is the same as the event
+                // name which the TCP Emitter client subscribed to.
+                assert.strictEqual(event, eventName)
+
+                // Assert that socket is of type 'net.Socket'.
+                assert.ok(socket instanceof net.Socket)
+
+                done()
+              })
+
+              // Subscribe to an event.
+              return clientInst.write(payloadUtils.createUnsubscribe({ event }))
+            })
+          })
+        })
+      })
+    })
+  })
+
+  describe('Scenario: Unsubscribing from an unsubscribed event:', function () {
+    describe('Given a TCP Emitter server,', function () {
+      /**
+       * TCP Emitter server.
+       * @type {Object}
+       */
+      let serverInst = null
+
+      beforeEach(function () {
+        // Create the TCP Emitter server which the TCP Emitter client will be
+        // connecting to.
+        return netUtils.createTCPEmitterServer().then(server => {
+          serverInst = server
+        })
+      })
+
+      afterEach(function () {
+        return netUtils.closeTCPEmitterServer(serverInst)
+      })
+
+      describe('with a connected TCP Emitter client,', function () {
+        /**
+         * TCP Emitter client that will be subscribing to an event.
+         * @type {net.Socket}
+         */
+        let clientInst = null
+
+        beforeEach(function () {
+          // Create the TCP Emitter client and connect it with the TCP Emitter
+          // server for this test.
+          return netUtils.createTCPEmitterClient(serverInst.address())
+            .then(client => { clientInst = client })
+        })
+
+        afterEach(function () {
+          return netUtils.closeTCPEmitterClient(clientInst)
+        })
+
+        describe('when the TCP Emitter client request to unsubscribes from an event that it is not subscribed to:', function () {
+          /**
+           * Event which the TCP Emitter client will be unsubscribing from.
+           * @type {string}
+           */
+          let event = null
+
+          beforeEach(function () {
+            event = 'event-name'
+          })
+
+          it('should not emit TCP Emitter Unsubscribe Event', function (done) {
+            global.setTimeout(done, 500)
+
+            serverInst.on(eventList.unsubscribe, data => {
+              assert.fail('TCP Emitter server should not emit TCP Emitter ' +
+                'Unsubscribe Event if the TCP Emitter client requests to ' +
+                'unsubscribe from an event that it is not subscribed to')
+              done()
+            })
+
+            // Unsubscribe from an event that the TCP Emitter client is not
+            // subscribed to.
+            clientInst.write(payloadUtils.createUnsubscribe({ event }))
+          })
+        })
+      })
+    })
+  })
+
   describe('Scenario: Broadcasting to an event:', function () {
     describe('Given a TCP Emitter server,', function () {
       /**

@@ -210,9 +210,6 @@ module.exports = {
     // Stop process if the specified event has no listeners.
     if (listeners === undefined) return
 
-    // Next we will be removing the TCP Emitter client from the event's list of
-    // listeners.
-
     /**
      * The position of the TCP Emitter client inside the event's list of
      * listeners.
@@ -228,7 +225,12 @@ module.exports = {
     listeners.splice(socketPosition, 1)
 
     // Remove the event's entry if it doesn't have any listeners left.
-    if (listeners.length === 0) return delete this.subscriptions[event]
+    if (listeners.length === 0) delete this.subscriptions[event]
+
+    // Emit TCP Emitter Unsubscribe Event with:
+    //   * the TCP Emitter client.
+    //   * name of the event.
+    this.emit(eventList.unsubscribe, socket, event)
   },
 
   /**
