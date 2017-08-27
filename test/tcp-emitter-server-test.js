@@ -60,9 +60,7 @@ describe('TCP Emitter Server Tests:', function () {
           // Create the TCP Emitter client and connect it with the TCP Emitter
           // server for this test.
           return netUtils.createTCPEmitterClient(serverInst.address())
-            .then(client => {
-              clientInst = client
-            })
+            .then(client => { clientInst = client })
         })
 
         afterEach(function () {
@@ -131,9 +129,7 @@ describe('TCP Emitter Server Tests:', function () {
           // Create the TCP Emitter client and connect it with the TCP Emitter
           // server for this test.
           return netUtils.createTCPEmitterClient(serverInst.address())
-            .then(client => {
-              clientInst = client
-            })
+            .then(client => { clientInst = client })
         })
 
         afterEach(function () {
