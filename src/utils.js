@@ -32,5 +32,33 @@ module.exports = {
     } catch (e) {
       return {}
     }
+  },
+
+  /**
+   * Function used to promisify the 'net.Socket.write' function.
+   * @see {@link https://nodejs.org/api/net.html#net_class_net_socket|
+   *      net.Socket}
+   * @param  {net.Socket} socket  TCP Emitter client that the message will be
+   *                              sent to.
+   * @param  {string} message     Message to be sent.
+   * @return {Promise}            When the message is sent successfully, it
+   *                              returns a resolved promise.
+   * @return {Promise.<Error>}    When the message is not sent successfully, it
+   *                              returns a promise rejected with an error.
+   */
+  write (socket, message) {
+    return new Promise((resolve, reject) => {
+      // When the 'error' event is emitted, it means that the message has not
+      // been sent, thus reject the promise with the error.
+      socket.on('error', reject)
+
+      // Try sending the message to the TCP Emitter client and if it succeeds,
+      // remove the error listener added in this promise and resolve the
+      // promise.
+      socket.write(message, () => {
+        socket.removeListener('error', reject)
+        resolve()
+      })
+    })
   }
 }

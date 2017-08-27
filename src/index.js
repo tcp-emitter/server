@@ -1,6 +1,8 @@
 'use strict'
 
 const net = require('net')
+const EventEmitter = require('events')
+const eventList = require('./event-list')
 const tcpEmitter = require('./tcp-emitter')
 
 /**
@@ -28,14 +30,26 @@ module.exports = function createTCPEmitterServer (opts = {}) {
    * TCP Emitter object.
    * @type {module:tcp-emitter}
    */
-  const tcpEmitterInst = Object.create(tcpEmitter)
+  const tcpEmitterInst = Object.assign(Object.create(new EventEmitter()),
+    tcpEmitter)
 
   // Initialize the newly created TCP Emitter.
   tcpEmitterInst.init({ delimiter: opts.delimiter })
 
   // Create & return a new TCP Server configured such that new connections are
   // handled by TCP Emitter.
-  return net.createServer(tcpEmitterInst.handleSocket({
+  const server = net.createServer(tcpEmitterInst.handleSocket({
     verifyClient: opts.verifyClient
   }))
+
+  // Expose events that can be used by the TCP Emitter server user.
+  ;[
+    'error',
+    eventList.subscribe,
+    eventList.broadcast,
+    eventList.unsubscribe
+  ].forEach(ev => tcpEmitterInst.on(ev, (...args) => server.emit(ev, ...args)))
+
+  // Return the TCP server.
+  return server
 }

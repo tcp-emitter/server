@@ -1,13 +1,8 @@
 'use strict'
 
+const utils = require('./utils')
+const eventList = require('./event-list')
 const tcpEmitterClient = require('./client')
-
-/**
- * Name of the event emitted by TCP Emitter clients upon the receival of a valid
- * payload.
- * @type {string}
- */
-const TCP_EMITTER_PAYLOAD_EVENT = 'tcp-emitter-payload'
 
 /**
  * @module tcp-emitter
@@ -88,13 +83,12 @@ module.exports = {
 
     // Initialize the newly created TCP Emitter client.
     tcpEmitterClientInst.init({
-      delimiter: this.delimiter,
-      tcpEmitterPayloadEvent: TCP_EMITTER_PAYLOAD_EVENT
+      delimiter: this.delimiter
     })
 
     // Listen for & parse new TCP Emitter payloads sent by the TCP Emitter
     // client.
-    tcpEmitterClientInst.on(TCP_EMITTER_PAYLOAD_EVENT, payload => {
+    tcpEmitterClientInst.on(eventList.payload, payload => {
       this.parsePayload({ payload, socket: tcpEmitterClientInst })
     })
 
@@ -146,7 +140,7 @@ module.exports = {
    * Function used to subscribe a TCP Emitter client to an event.
    * @see {@link https://nodejs.org/api/net.html#net_class_net_socket|
    *      net.Socket}
-   * @param  {net.Socket} opts        Options for subscribe function.
+   * @param  {Object} opts            Options for subscribe function.
    * @param  {net.Socket} opts.socket TCP Emitter client to be subscribed.
    * @param  {stirng}     opts.event  Event name which the TCP Emitter client
    *                                  will be subscribing to.
@@ -174,13 +168,18 @@ module.exports = {
 
     // Finally include the TCP Emitter client in the event's list of listeners.
     listeners.push(socket)
+
+    // Emit TCP Emitter Subscribe Event with:
+    //   * the TCP Emitter client.
+    //   * name of the event.
+    this.emit(eventList.subscribe, socket, event)
   },
 
   /**
    * Function used to unsubscribe a TCP Emitter client from an event.
    * @see {@link https://nodejs.org/api/net.html#net_class_net_socket|
    *      net.Socket}
-   * @param  {net.Socket} opts        Options for unsubscribe function.
+   * @param  {Object} opts            Options for unsubscribe function.
    * @param  {net.Socket} opts.socket TCP Emitter client to be unsubscribed.
    * @param  {string} opts.event      Event name which the TCP Emitter client
    *                                  will be unsubscribed from.
@@ -211,9 +210,6 @@ module.exports = {
     // Stop process if the specified event has no listeners.
     if (listeners === undefined) return
 
-    // Next we will be removing the TCP Emitter client from the event's list of
-    // listeners.
-
     /**
      * The position of the TCP Emitter client inside the event's list of
      * listeners.
@@ -229,7 +225,12 @@ module.exports = {
     listeners.splice(socketPosition, 1)
 
     // Remove the event's entry if it doesn't have any listeners left.
-    if (listeners.length === 0) return delete this.subscriptions[event]
+    if (listeners.length === 0) delete this.subscriptions[event]
+
+    // Emit TCP Emitter Unsubscribe Event with:
+    //   * the TCP Emitter client.
+    //   * name of the event.
+    this.emit(eventList.unsubscribe, socket, event)
   },
 
   /**
@@ -238,7 +239,7 @@ module.exports = {
    * which itself is subscribed to, it won't be notified.
    * @see {@link https://nodejs.org/api/net.html#net_class_net_socket|
    *      net.Socket}
-   * @param  {net.Socket} opts        Options for broadcast function.
+   * @param  {Object} opts            Options for broadcast function.
    * @param  {net.Socket} opts.socket TCP Emitter client broadcasting the
    *                                  payload.
    * @param  {string} opts.event      Event which the payload will be
@@ -252,15 +253,33 @@ module.exports = {
      */
     const listeners = this.subscriptions[event]
 
-    // Stop process if the specified event has no listeners.
-    if (listeners === undefined) return
+    // Stores the promises created upon the request to notify the listeners of
+    // the event, so that when they are all notified TCP Emitter can emit the
+    // TCP Emitter Broadcast Event.
+    const promises = []
 
-    // Broadcast the payload to all the listeners of the specified event
+    // Broadcast the payload to all the listeners of the specified event,
     // ignoring the TCP Emitter client which the payload originated from.
-    listeners.forEach(listener => {
-      if (listener === socket) return
-      listener.write(JSON.stringify({ event, args }) + this.delimiter)
-    })
+    if (listeners !== undefined) {
+      listeners.forEach(listener => {
+        // Ignore listener if it is the TCP Emitter client that did the
+        // broadcast.
+        if (listener === socket) return
+
+        // Notify listener (TCP Emitter client).
+        promises.push(utils.write(listener, JSON.stringify({ event, args }) +
+          this.delimiter))
+      })
+    }
+
+    // Once all the event listeners (TCP Emitter clients) have been notified,
+    // emit the TCP Emitter Broadcast Event with:
+    //   * the TCP Emitter client.
+    //   * name of the event.
+    //   * the broadcasted arguments.
+    return Promise.all(promises).then(() => {
+      this.emit(eventList.broadcast, socket, event, args)
+    }).catch(err => this.emit('error', err))
   },
 
   /**
