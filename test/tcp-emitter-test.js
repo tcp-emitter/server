@@ -116,7 +116,8 @@ describe('TCP Emitter Tests:', function () {
       beforeEach(function () {
         // Create and initialize the TCP Emitter instance which the TCP Emitter
         // clients will be connecting to.
-        tcpEmitterInst = Object.create(tcpEmitter)
+        tcpEmitterInst = Object.assign(Object.create(new EventEmitter()),
+          tcpEmitter)
         tcpEmitterInst.init()
       })
 
