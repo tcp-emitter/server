@@ -57,9 +57,9 @@ The following table contains the events emitted by TCP Emitter server
 
 Name        | Description
 ----------- | -----------
-`subscribe`   | Event emitted when a `TCP Emitter client` subscribes to a TCP Emitter event. The listeners of this event are invoked with the `TCP Emitter client` & `event name`. Note when a `TCP Emitter client` requests to subscribe to an event that it is already subscribed to, this event is not emitted.
-`unsubscribe` | Event emitted when a `TCP Emitter client` unsubscribes to a TCP Emitter event. The listeners of this event are invoked with the `TCP Emitter client` & `event name`. Note when a `TCP Emitter client` requests to unsubscribe from an event that it is not subscribed to, this event is not emitted.
-`broadcast`   | Event emitted when a `TCP Emitter client` broadcasts to a TCP Emitter event. The listeners of this event are invoked with the `TCP Emitter client`, `event name` & `broadcast arguments`.
+`tcp-emitter-subscribe`   | Event emitted when a `TCP Emitter client` subscribes to a TCP Emitter event. The listeners of this event are invoked with the `TCP Emitter client` & `event name`. Note when a `TCP Emitter client` requests to subscribe to an event that it is already subscribed to, this event is not emitted.
+`tcp-emitter-unsubscribe` | Event emitted when a `TCP Emitter client` unsubscribes to a TCP Emitter event. The listeners of this event are invoked with the `TCP Emitter client` & `event name`. Note when a `TCP Emitter client` requests to unsubscribe from an event that it is not subscribed to, this event is not emitted.
+`tcp-emitter-broadcast`   | Event emitted when a `TCP Emitter client` broadcasts to a TCP Emitter event. The listeners of this event are invoked with the `TCP Emitter client`, `event name` & `broadcast arguments`.
 
 # TCP Emitter Clients
 As specified in the introduction, these can be implemented in any language as long as they follow the TCP Emitter Payload spec. A TCP Emitter client can do the following three different interactions with the `TCP Emitter server`:
