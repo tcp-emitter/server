@@ -30,7 +30,7 @@
     }
   },
   "devDependencies": {
-    "http-server": "^0.10.0",
+    "http-server": "^14.1.1",
     "jsdoc": "^3.5.3",
     "mocha": "^3.5.0",
     "nyc": "^11.1.0",
