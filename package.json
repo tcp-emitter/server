@@ -30,10 +30,10 @@
     }
   },
   "devDependencies": {
-    "http-server": "^0.10.0",
+    "http-server": "^14.1.1",
     "jsdoc": "^3.5.3",
-    "mocha": "^3.5.0",
-    "nyc": "^11.1.0",
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0",
     "standard": "^10.0.3"
   }
 }
